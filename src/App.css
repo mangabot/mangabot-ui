@@ -1,0 +1,46 @@
+.app-title-bar {
+  background-color: black;
+  color: #fff;
+}
+
+.app-name {
+  padding: 0.5rem 0 0.5rem 1rem;
+  text-transform: uppercase;
+  font-weight: bold;
+  font-size: 1.2rem;
+}
+
+.app-toolbar.uk-subnav-pill {
+  margin: 0;
+  background-color: #1b2839;
+}
+
+.app-toolbar.uk-subnav-pill > * {
+  padding-left: 0;
+}
+
+.app-toolbar.uk-subnav-pill > * > :first-child {
+  color: #fcfffe;
+  padding: 0.7rem 1.75rem;
+}
+.app-toolbar.uk-subnav-pill > .uk-active > a {
+  background-color: #63ae2d;
+}
+
+.app-content-container.uk-grid-divider {
+  margin: 0;
+  overflow: auto;
+  position: absolute;
+  top: calc(44.8px + 43.2px);
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+
+.app-content-container.uk-grid-divider > * {
+  padding: 0;
+}
+
+.app-content-container.uk-grid-divider > :not(.uk-first-column)::before {
+  left: 0;
+}

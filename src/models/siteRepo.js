@@ -1,25 +1,25 @@
-import randomKey from "../utils/RandomKey";
+import randomKey from '../utils/RandomKey';
 
 export default class SiteRepo {
-
   static get() {
-    return [{
+    return [
+      {
         id: randomKey(),
-        name: 'BlogTruyện',
+        name: 'Blog Truyện',
         url: 'blogtruyen.com',
         icon: '',
         category: 'Vietnamese'
       },
       {
         id: randomKey(),
-        name: 'TruyệnTranh8',
+        name: 'Truyện Tranh 8',
         url: 'truyentranh8.net',
         icon: '',
         category: 'Vietnamese'
       },
       {
         id: randomKey(),
-        name: 'TruyệnTranhTuần',
+        name: 'Truyện Tranh Tuần',
         url: 'truyentranhtuan.com',
         icon: '',
         category: 'Vietnamese'
@@ -33,14 +33,14 @@ export default class SiteRepo {
       },
       {
         id: randomKey(),
-        name: 'MangaFox',
+        name: 'Manga Fox',
         url: 'mangafox.me',
         icon: '',
         category: 'English'
       },
       {
         id: randomKey(),
-        name: 'MangaPark',
+        name: 'Manga Park',
         url: 'mangapark.me',
         icon: '',
         category: 'English'

@@ -23,8 +23,24 @@ class App extends Component {
 
     return (
       <div className="App">
+        <div className="app-title-bar">
+          <div className="app-name">Manga Bot</div>
+        </div>
+
+        <ul className="app-toolbar uk-subnav uk-subnav-pill" data-uk-margin>
+          <li className="uk-active">
+            <a href="#">Danh sách truyện</a>
+          </li>
+          <li>
+            <a href="#">Danh sách tải</a>
+          </li>
+          <li>
+            <a href="#">Cấu hình</a>
+          </li>
+        </ul>
+
         <div
-          className="uk-grid-divider uk-grid-match uk-child-width-1-3"
+          className="app-content-container uk-grid-divider uk-grid-match uk-child-width-1-3"
           data-uk-grid
         >
           <div className="">
