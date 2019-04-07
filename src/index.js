@@ -8,6 +8,8 @@ import * as serviceWorker from './serviceWorker';
 import UIkit from 'uikit';
 import Icons from 'uikit/dist/js/uikit-icons';
 
+console.log(process.env);
+
 // loads the Icon plugin
 UIkit.use(Icons);
 

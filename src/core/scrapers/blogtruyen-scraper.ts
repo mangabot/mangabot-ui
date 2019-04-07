@@ -2,9 +2,12 @@ import { Observable } from "rxjs";
 import { map } from "rxjs/operators";
 import Chapter from '../models/chapter.model';
 import Manga from "../models/manga.model";
+import Page from "../models/page.model";
 import PageSourceService from "../services/page-source.service";
 import StringUtils from "../utils/string.util";
-import Scraper, { DefaultScraper } from './scraper';
+import DefaultScraper from "./default-scraper";
+import Scraper from './scraper';
+
 
 declare var $: any;
 
@@ -33,7 +36,10 @@ export class BlogTruyenScraper extends DefaultScraper implements Scraper {
           lastMatch = match;
         }
 
-        return lastMatch != null ? +lastMatch.groups["INDEX"] : 1;
+        const totalPages = lastMatch != null ? +lastMatch.groups["INDEX"] : 1;
+        console.log(`Total Pages: ${totalPages}`);
+
+        return totalPages;
       })
     );
   }
@@ -44,7 +50,7 @@ export class BlogTruyenScraper extends DefaultScraper implements Scraper {
         let blockFilter = "<(?<TAG>\\w+)[^>]*?class\\s*=\\s*[\"|']\\s*tiptip[^>]*?>(?<TEXT>(.|\\n|\\s)+?)</\\k<TAG>>";
         let nameAndUrlFilter = "<a[^>]*?href\\s*=\\s*[\"|'](?<MANGA_URL>.*?)[\"|'][^>]*?>(?<MANGA_NAME>.*?)</a>";
 
-        let results = new Array<Manga>();
+        let result = new Array<Manga>();
         let reg = new RegExp(blockFilter, 'gmi');
         let match;
 
@@ -54,11 +60,16 @@ export class BlogTruyenScraper extends DefaultScraper implements Scraper {
           let name = StringUtils.trimAll(subMatch.groups['MANGA_NAME']);
           let url = StringUtils.fixUrl('http://blogtruyen.com', subMatch.groups['MANGA_URL']);
           if (name != null && url != null) {
-            results.push(new Manga(name, url));
+            let manga = new Manga();
+            manga.name = name;
+            manga.url = url;
+            result.push(manga);
           }
         }
 
-        return results;
+        console.log(result);
+
+        return result;
       })
     );
   }
@@ -68,9 +79,9 @@ export class BlogTruyenScraper extends DefaultScraper implements Scraper {
     let match: any = reg.exec(mangaUrl);
     let mangaId = match.groups["MANGA_ID"];
 
-    return this.pageSourceService.getPageSource(this.getChapterListUrl(mangaId)).pipe(
+    return this.pageSourceService.getPageSource(this.getChapterListUrl(mangaUrl)).pipe(
       map(html => {
-        let results = new Array<Chapter>();
+        let result = new Array<Chapter>();
         let $doc = $(html);
         let chapterBlocks: Array<any> = $doc.find('#list-chapters p');
         for (let i = 0; i < chapterBlocks.length; i++) {
@@ -79,10 +90,41 @@ export class BlogTruyenScraper extends DefaultScraper implements Scraper {
           let name = StringUtils.trimAll($(title).html());
           let url = StringUtils.fixUrl('http://blogtruyen.com', $(title).attr('href').replace(/\.\.\//gi, ''));
           if (name != null && url != null) {
-            results.push(new Chapter(name, url));
+            let chapter = new Chapter();
+            chapter.name = name;
+            chapter.url = url;
+            result.push(chapter);
           }
         }
-        return results;
+
+        console.log(result);
+
+        return result;
+      })
+    );
+  }
+
+  getPageList(chapterUrl: string): Observable<Array<Page>> {
+    return this.pageSourceService.getPageSource(this.getPageListUrl(chapterUrl)).pipe(
+      map(html => {
+        let result = new Array<Page>();
+        let $doc = $(html);
+        let chapterBlocks: Array<any> = $doc.find('#list-chapters p');
+        for (let i = 0; i < chapterBlocks.length; i++) {
+          let chapBlk = chapterBlocks[i];
+          let title = $(chapBlk).find('.title a');
+          let name = StringUtils.trimAll($(title).html());
+          let url = StringUtils.fixUrl('http://blogtruyen.com', $(title).attr('href').replace(/\.\.\//gi, ''));
+          if (name != null && url != null) {
+            let page = new Page();
+            page.url = url;
+            result.push(page);
+          }
+        }
+
+        console.log(result);
+
+        return result;
       })
     );
   }

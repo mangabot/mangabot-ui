@@ -9,10 +9,6 @@ import routes from './constants/routes';
 class App extends Component {
   Routes = [{ MANGA: 1 }, { QUEUE: 2 }, { SETTINGS: 3 }];
 
-  constructor(props) {
-    super(props);
-  }
-
   render() {
     return (
       <div className="App">

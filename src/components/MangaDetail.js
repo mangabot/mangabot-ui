@@ -2,8 +2,10 @@ import React, { Component } from 'react';
 import styles from './MangaDetail.module.css';
 
 export default class MangaDetail extends Component {
+  handleAddQueue() {}
+
   render() {
-    const { site, manga } = this.props;
+    const { manga } = this.props;
 
     return (
       <div className="">
@@ -19,10 +21,14 @@ export default class MangaDetail extends Component {
           </div>
           <ul className="uk-flex-right uk-flex-auto uk-iconnav">
             <li>
-              <a href="" uk-icon="icon: plus" />
+              <a href="#" uk-icon="icon: plus" onClick={this.handleAddQueue} />
             </li>
             <li>
-              <a href="" uk-icon="icon: download" />
+              <a
+                href="#"
+                uk-icon="icon: download"
+                onClick={this.handleAddQueue}
+              />
             </li>
           </ul>
         </div>

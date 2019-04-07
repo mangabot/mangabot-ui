@@ -1,22 +1,23 @@
 import React, { Component } from 'react';
-import randomKey from '../core/utils/RandomKey';
-import MangaRepo from '../core/repos/mangaRepo';
-import SiteRepo from '../core/repos/siteRepo';
-import CategoryRepo from '../core/repos/categoryRepo';
+import { Categories, Sites, SiteType } from '../core/models/site.model';
+import { ScraperFactory } from '../core/scrapers/scraper';
 import './MangaList.css';
+import { tap, switchMap, repeat, finalize } from 'rxjs/operators';
 
 export default class MangaList extends Component {
+  scraperFactory = new ScraperFactory();
+
   constructor(props) {
     super(props);
 
-    const sites = SiteRepo.get();
-
     this.state = {
       open: false,
-      categories: CategoryRepo.get(),
-      activeSiteId: sites[0].id,
-      sites: sites,
-      mangas: MangaRepo.get()
+      categories: Categories,
+      sites: Sites,
+      activeSiteId: Sites[0].id,
+      activeSite: Sites[0],
+      mangas: [],
+      totalManga: 0
     };
   }
 
@@ -25,10 +26,26 @@ export default class MangaList extends Component {
   }
 
   handleSiteSelected = siteId => e => {
-    this.setState({ activeSiteId: siteId });
-    this.props.onSiteSelected(
-      this.state.sites.find(site => site.id === siteId)
-    );
+    let activeSite = this.state.sites.find(site => site.id === siteId);
+
+    this.setState({ activeSiteId: siteId, activatedSite: activeSite });
+
+    this.props.onSiteSelected(activeSite);
+
+    let scraper = this.scraperFactory.getScraper(SiteType[activeSite.type]);
+
+    scraper
+      .getTotalPages()
+      .pipe(
+        tap(total => this.setState({ totalManga: total })),
+        switchMap(total => scraper.getMangaList(1)),
+        repeat(5),
+        finalize(() => {
+          this.loading = false;
+          console.log('Fetch manga completed.');
+        })
+      )
+      .subscribe(list => this.setState({ mangas: list }));
   };
 
   handleMangaSelected = mangaId => e => {
@@ -39,7 +56,7 @@ export default class MangaList extends Component {
   };
 
   render() {
-    const { categories, sites, mangas } = this.state;
+    const { categories, sites, mangas, activeSiteId } = this.state;
 
     return (
       <div className="">
@@ -105,6 +122,7 @@ export default class MangaList extends Component {
               <MangaListItem
                 key={m.id}
                 manga={m}
+                active={activeSiteId === m.id}
                 onSelected={this.handleMangaSelected(m.id)}
               />
             ))}
@@ -125,7 +143,7 @@ class MangaListItem extends Component {
 
     return (
       <React.Fragment>
-        <li>
+        <li className={active ? 'uk-active' : ''}>
           <a className="uk-padding-small" href="#" onClick={this.handleClicked}>
             <div className="uk-flex uk-flex-middle uk-padding-small uk-padding-remove-top uk-padding-remove-bottom">
               <img src={manga.thumbnail} width="48px" height="48px" alt="" />

@@ -1,10 +1,8 @@
 // import { ipcRenderer } from 'electron';
-
 import { from, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
 declare var fetch: any;
-
 
 /**
  * Wrap node-fetch and expose Observable

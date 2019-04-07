@@ -11,6 +11,11 @@ export enum CategoryType {
   VIETNAMESE, ENGLISH
 }
 
+export const Categories = [
+  CategoryType[CategoryType.VIETNAMESE],
+  CategoryType[CategoryType.ENGLISH]
+];
+
 export enum SiteType {
   // Vietnamese
   BLOGTRUYEN,
@@ -76,3 +81,12 @@ export const MangaPark: Site = {
   category: CategoryType[CategoryType.ENGLISH],
   type: SiteType[SiteType.MANGAPARK]
 };
+
+export const Sites = [
+  BlogTruyen,
+  TruyenTranh8,
+  TruyenTranhTuan,
+  MangaK,
+  MangaFox,
+  MangaPark
+];
