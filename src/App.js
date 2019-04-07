@@ -1,26 +1,19 @@
 import React, { Component } from 'react';
+import { Route, Switch, Link, NavLink } from 'react-router-dom';
 import './App.css';
-import MangaList from './components/MangaList';
-import MangaDetail from './components/MangaDetail';
+import MangaPage from './pages/MangaPage';
+import SettingsPage from './pages/SettingsPage';
+import QueuePage from './pages/QueuePage';
+import routes from './constants/routes';
 
 class App extends Component {
+  Routes = [{ MANGA: 1 }, { QUEUE: 2 }, { SETTINGS: 3 }];
+
   constructor(props) {
     super(props);
-
-    this.state = { activeSite: null, activeManga: null };
   }
 
-  handleSiteSelected = site => {
-    this.setState({ activeSite: site });
-  };
-
-  handleMangaSelected = manga => {
-    this.setState({ activeManga: manga });
-  };
-
   render() {
-    const { activeSite, activeManga } = this.state;
-
     return (
       <div className="App">
         <div className="app-title-bar">
@@ -29,34 +22,46 @@ class App extends Component {
 
         <ul className="app-toolbar uk-subnav uk-subnav-pill" data-uk-margin>
           <li className="uk-active">
-            <a href="#">Danh sách truyện</a>
+            <Link
+              to={{
+                pathname: routes.HOME,
+                state: { isHomeRoute: true }
+              }}
+            >
+              Danh sách truyện
+            </Link>
           </li>
           <li>
-            <a href="#">Danh sách tải</a>
+            <NavLink
+              to={{
+                pathname: routes.QUEUE,
+                state: { activeRoute: routes.QUEUE }
+              }}
+            >
+              Danh sách tải
+            </NavLink>
           </li>
           <li>
-            <a href="#">Cấu hình</a>
+            <NavLink
+              to={{
+                pathname: routes.SETTINGS,
+                state: { activeRoute: routes.SETTINGS }
+              }}
+            >
+              Cấu hình
+            </NavLink>
           </li>
         </ul>
 
-        <div
-          className="app-content-container uk-grid-divider uk-grid-match uk-child-width-1-3"
-          data-uk-grid
-        >
-          <div className="">
-            <MangaList
-              onSiteSelected={this.handleSiteSelected}
-              onMangaSelected={this.handleMangaSelected}
+        <div className="app-content-container">
+          <Switch>
+            <Route exact path="/" render={props => <MangaPage {...props} />} />
+            <Route path="/queue" render={props => <QueuePage {...props} />} />
+            <Route
+              path="/settings"
+              render={props => <SettingsPage {...props} />}
             />
-          </div>
-
-          <div className="uk-width-2-3">
-            {activeManga == null ? (
-              <div />
-            ) : (
-              <MangaDetail site={activeSite} manga={activeManga} />
-            )}
-          </div>
+          </Switch>
         </div>
       </div>
     );

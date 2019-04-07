@@ -1,0 +1,17 @@
+.mbGridDivider {
+  margin: 0;
+  overflow: auto;
+  position: absolute;
+  top: calc(44.8px + 43.2px);
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+
+.mbGridDivider > * {
+  padding: 0;
+}
+
+.mbGridDivider > :not(.uk-first-column)::before {
+  left: 0;
+}
