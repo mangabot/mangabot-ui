@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
-import randomKey from '../utils/RandomKey';
-import MangaRepo from '../models/mangaRepo';
-import SiteRepo from '../models/siteRepo';
-import CategoryRepo from '../models/categoryRepo';
+import randomKey from '../core/utils/RandomKey';
+import MangaRepo from '../core/repos/mangaRepo';
+import SiteRepo from '../core/repos/siteRepo';
+import CategoryRepo from '../core/repos/categoryRepo';
 import './MangaList.css';
 
 export default class MangaList extends Component {
