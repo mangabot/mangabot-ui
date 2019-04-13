@@ -3,6 +3,8 @@ import { map } from "rxjs/operators";
 import Chapter from '../models/chapter.model';
 import Manga from "../models/manga.model";
 import Page from "../models/page.model";
+import { SiteType } from "../models/site.model";
+import LogService from "../services/log.service";
 import PageSourceService from "../services/page-source.service";
 import StringUtils from "../utils/string.util";
 import DefaultScraper from "./default-scraper";
@@ -37,7 +39,7 @@ export class BlogTruyenScraper extends DefaultScraper implements Scraper {
         }
 
         const totalPages = lastMatch != null ? +lastMatch.groups["INDEX"] : 1;
-        console.log(`Total Pages: ${totalPages}`);
+        LogService.log(`Total Pages: ${totalPages}`);
 
         return totalPages;
       })
@@ -47,27 +49,35 @@ export class BlogTruyenScraper extends DefaultScraper implements Scraper {
   getMangaList(pageIndex: number): Observable<Array<Manga>> {
     return this.pageSourceService.getPageSource(this.getMangaListUrl(pageIndex)).pipe(
       map(html => {
-        let blockFilter = "<(?<TAG>\\w+)[^>]*?class\\s*=\\s*[\"|']\\s*tiptip[^>]*?>(?<TEXT>(.|\\n|\\s)+?)</\\k<TAG>>";
-        let nameAndUrlFilter = "<a[^>]*?href\\s*=\\s*[\"|'](?<MANGA_URL>.*?)[\"|'][^>]*?>(?<MANGA_NAME>.*?)</a>";
-
         let result = new Array<Manga>();
-        let reg = new RegExp(blockFilter, 'gmi');
-        let match;
 
-        while (match = reg.exec(html)) {
-          let subReg = new RegExp(nameAndUrlFilter, 'gmi');
-          let subMatch: any = subReg.exec(match.groups['TEXT']);
-          let name = StringUtils.trimAll(subMatch.groups['MANGA_NAME']);
-          let url = StringUtils.fixUrl('http://blogtruyen.com', subMatch.groups['MANGA_URL']);
+        let $ = this.loadHtml(html);
+        let rows = $('.tiptip');
+        let tips = $('.tiptip-content');
+
+        for (let i = 0; i < rows.length; i++) {
+          let row = rows[i];
+          let tooltipId = row.attribs['data-tiptip'];
+          let a = $('a', row);
+          let name = StringUtils.trimAll(a.html());
+          let url = StringUtils.fixUrl('http://blogtruyen.com', a.attr('href'));
+
           if (name != null && url != null) {
             let manga = new Manga();
             manga.name = name;
             manga.url = url;
+            manga.site = SiteType[SiteType.BLOGTRUYEN];
+
+            for (let k = 0; k < tips.length; k++) {
+              if (tips[k].attribs['id'] === tooltipId) {
+                manga.thumbnail = $('img', tips[k]).attr('src');
+                break;
+              }
+            }
+
             result.push(manga);
           }
         }
-
-        console.log(result);
 
         return result;
       })
@@ -75,29 +85,26 @@ export class BlogTruyenScraper extends DefaultScraper implements Scraper {
   }
 
   getChapterList(mangaUrl: string): Observable<Array<Chapter>> {
-    let reg = new RegExp("(http://|https://)?blogtruyen.com/(?<MANGA_ID>[^/]*?)/.*", "gmi");
-    let match: any = reg.exec(mangaUrl);
-    let mangaId = match.groups["MANGA_ID"];
-
     return this.pageSourceService.getPageSource(this.getChapterListUrl(mangaUrl)).pipe(
       map(html => {
         let result = new Array<Chapter>();
-        let $doc = $(html);
-        let chapterBlocks: Array<any> = $doc.find('#list-chapters p');
+
+        let $ = this.loadHtml(html);
+        let chapterBlocks = $('#list-chapters p');
+
         for (let i = 0; i < chapterBlocks.length; i++) {
           let chapBlk = chapterBlocks[i];
-          let title = $(chapBlk).find('.title a');
-          let name = StringUtils.trimAll($(title).html());
-          let url = StringUtils.fixUrl('http://blogtruyen.com', $(title).attr('href').replace(/\.\.\//gi, ''));
+          let a = $('.title a', chapBlk);
+          let name = StringUtils.trimAll(a.html());
+          let url = StringUtils.fixUrl('http://blogtruyen.com', a.attr('href').replace(/\.\.\//gi, ''));
           if (name != null && url != null) {
             let chapter = new Chapter();
             chapter.name = name;
             chapter.url = url;
+            chapter.site = SiteType[SiteType.BLOGTRUYEN];
             result.push(chapter);
           }
         }
-
-        console.log(result);
 
         return result;
       })
@@ -118,11 +125,10 @@ export class BlogTruyenScraper extends DefaultScraper implements Scraper {
           if (name != null && url != null) {
             let page = new Page();
             page.url = url;
+            page.site = SiteType[SiteType.BLOGTRUYEN];
             result.push(page);
           }
         }
-
-        console.log(result);
 
         return result;
       })

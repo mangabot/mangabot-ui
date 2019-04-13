@@ -1,5 +1,11 @@
+import cheerio from 'cheerio';
+
 export default class DefaultScraper {
   constructor(public listUrl: string) { }
+
+  loadHtml(html) {
+    return cheerio.load(html);
+  }
 
   getMangaListUrl(pageIndex: number): string {
     return process.env.REACT_APP_MOCK === "true" ?

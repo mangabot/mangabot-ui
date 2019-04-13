@@ -1,7 +1,7 @@
-import StringUtils from "../utils/string.util";
+import randomKey from "../utils/RandomKey";
 
 export default class Page {
-  id: string = StringUtils.createUUID();
+  id: string = randomKey();
   url: string;
   site: string;
 }

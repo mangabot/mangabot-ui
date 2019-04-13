@@ -1,7 +1,7 @@
-import StringUtils from "../utils/string.util";
+import randomKey from "../utils/RandomKey";
 
 export default class Chapter {
-  id: string = StringUtils.createUUID();
+  id: string = randomKey();
   name: string;
   url: string;
   thumbnail: string;
